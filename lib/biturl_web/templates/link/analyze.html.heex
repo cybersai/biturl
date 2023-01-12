@@ -1,0 +1,9 @@
+<section class="phx-hero">
+  <h1>BitURL</h1>
+  <p>Blazing fast url shortener</p>
+</section>
+
+<section class="row">
+  <%= form_for @changeset, Routes.link_path(@conn, :analyze), fn form -> %>
+  <% end %>
+</section>

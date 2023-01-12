@@ -17,7 +17,9 @@ defmodule BitURLWeb.Router do
   scope "/", BitURLWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", LinkController, :home
+    post "/analyze", LinkController, :analyze
+    post "/links", LinkController, :create
   end
 
   # Other scopes may use custom stacks.
