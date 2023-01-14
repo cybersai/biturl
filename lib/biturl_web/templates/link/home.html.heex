@@ -4,15 +4,12 @@
 </section>
 
 <section>
-  <%= form_for @changeset, Routes.link_path(@conn, :create), fn form -> %>
-    <%= text_input form, :url, placeholder: "Enter URL to shorten" %>
-    <div class="row">
-      <div class="column column-25 column-offset-25">
-        <%= submit "Analyze URL", style: "width: 100%" %>
+  <%= form_for @changeset, Routes.link_path(@conn, :analyze), fn form -> %>
+    <%= url_input form, :url, placeholder: "Enter URL to analyze" %>
+      <div class="row">
+        <div class="column column-50 column-offset-25">
+          <%= submit "Analyze URL", style: "width: 100%" %>
+        </div>
       </div>
-      <div class="column column-25">
-        <%= submit "Shorten URL", style: "width: 100%" %>
-      </div>
-    </div>
   <% end %>
 </section>

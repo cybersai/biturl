@@ -1,9 +1,38 @@
 <section class="phx-hero">
-  <h1>BitURL</h1>
-  <p>Blazing fast url shortener</p>
+  <table>
+    <tbody>
+      <tr>
+        <td>Status Code</td>
+        <td><%= @summary.status_code %></td>
+      </tr>
+      <tr>
+        <td>Title</td>
+        <td><%= @summary.title %></td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td><%= @summary.description %></td>
+      </tr>
+      <tr>
+        <td>Image</td>
+        <td>
+          <%= if @summary.image !== nil do %>
+            <img src={@summary.image}>
+          <% end %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </section>
 
-<section class="row">
-  <%= form_for @changeset, Routes.link_path(@conn, :analyze), fn form -> %>
+<section>
+  <%= form_for @changeset, Routes.link_path(@conn, :create), fn form -> %>
+    <%= hidden_input form, :url %>
+    <%= url_input form, :url_display, value: @changeset.changes.url, readonly: "readonly" %>
+      <div class="row">
+        <div class="column column-50 column-offset-25">
+          <%= submit "Shorten URL", style: "width: 100%" %>
+        </div>
+      </div>
   <% end %>
 </section>
