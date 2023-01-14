@@ -4,11 +4,14 @@ defmodule BitURL.Link do
   end
 
   use Ecto.Schema
+  alias BitURL.Hit
   import Ecto.Changeset
 
   schema "links" do
     field :bit, :string
     field :url, :string
+
+    has_many :hits, Hit
 
     timestamps()
   end

@@ -6,11 +6,13 @@ defmodule BitURL do
   Contexts are also responsible for managing your data, regardless
   if it comes from the database, an external API or others.
   """
+  import Ecto.Query, only: [from: 2]
   alias BitURL.Link.Summary
   alias BitURL.Repo
   alias BitURL.Link
+  alias BitURL.Hit
 
-  def change_link(link) do
+  def change_link(%{} = link) do
     Link.changeset(%Link{}, link)
   end
 
@@ -19,9 +21,9 @@ defmodule BitURL do
       {:ok, document} <- Floki.parse_document(body) do
         {:ok, %Summary{
           status_code: status_code,
-          title: Floki.attribute(document, "meta[property=\"og:title\"]", "content") |> Enum.uniq() |> List.first(),
-          description: Floki.attribute(document, "meta[property=\"og:description\"]", "content") |> Enum.uniq() |> List.first(),
-          image: Floki.attribute(document, "meta[property=\"og:image\"]", "content") |> Enum.uniq() |> List.first()
+          title: Floki.attribute(document, "meta[property=\"og:title\"]", "content") |> List.first(),
+          description: Floki.attribute(document, "meta[property=\"og:description\"]", "content") |> List.first(),
+          image: Floki.attribute(document, "meta[property=\"og:image\"]", "content") |> List.first()
         }}
     else
       {:ok, %HTTPoison.Response{}} -> {:error, "unsuccesful response"}
@@ -30,10 +32,54 @@ defmodule BitURL do
     end
   end
 
-  def create_link(link) do
+  def create_link(%{} = link) do
     %Link{}
       |> Map.put(:bit, Link.bit())
       |> Link.changeset(link)
       |> Repo.insert()
+  end
+
+  def get_link_by_bit(bit) do
+    Repo.get_by(Link, bit: bit)
+  end
+
+  def record_hit_for_link(%Link{} = link, user_agent) do
+    IO.inspect(user_agent)
+    link
+      |> Ecto.build_assoc(:hits)
+      |> Hit.changeset(user_agent |> extract_user_agent_info())
+      |> Repo.insert()
+  end
+
+  defp extract_user_agent_info(nil) do
+    %{
+        device: "Unknown",
+        os: "Unknown",
+        browser: "Unknown"
+    }
+  end
+
+  defp extract_user_agent_info(user_agent) do
+    %{
+        device: cond do
+          String.contains?(user_agent, "Mobi") -> "Mobile"
+          true -> "Desktop"
+        end,
+        os: cond do
+          String.contains?(user_agent, "Android") -> "Android"
+          String.contains?(user_agent, "iPhone") -> "iPhone"
+          String.contains?(user_agent, "Win") -> "Windows"
+          String.contains?(user_agent, "Mac") -> "Mac"
+          String.contains?(user_agent, "Linux") -> "Linux"
+          true -> "Unknown"
+        end,
+        browser: cond do
+          String.contains?(user_agent, ["Opera", "OPR"]) -> "Opera"
+          String.contains?(user_agent, "Firefox") -> "Firefox"
+          String.contains?(user_agent, "Chrome") -> "Chrome" # Chrome always before Safari because Chrome can contain Safari
+          String.contains?(user_agent, "Safari") -> "Safari"
+          true -> "Unknown"
+        end
+    }
   end
 end
