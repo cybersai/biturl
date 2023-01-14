@@ -1,4 +1,8 @@
 defmodule BitURL.Hit do
+  defmodule Stats do
+    defstruct devices: [], oss: [], browsers: []
+  end
+
   use Ecto.Schema
   alias BitURL.Link
   import Ecto.Changeset

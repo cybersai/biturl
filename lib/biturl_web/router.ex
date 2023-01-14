@@ -21,6 +21,7 @@ defmodule BitURLWeb.Router do
     post "/analyze", LinkController, :analyze
     post "/links", LinkController, :create
     get "/:bit", LinkController, :hit
+    get "/:bit/stats", LinkController, :stats
   end
 
   # Other scopes may use custom stacks.

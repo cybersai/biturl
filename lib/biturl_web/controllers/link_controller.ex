@@ -1,4 +1,5 @@
 defmodule BitURLWeb.LinkController do
+  alias BitURL.Hit.Stats
   alias BitURL.Hit
   alias BitURL.Link.Summary
   alias BitURL.Link
@@ -22,10 +23,10 @@ defmodule BitURLWeb.LinkController do
 
   def create(conn, %{"link" => link}) do
     case BitURL.create_link(link) do
-      {:ok, %Link{}} ->
+      {:ok, %Link{} = link} ->
         conn
         |> put_flash(:info, "New link created")
-        |> redirect(to: Routes.link_path(conn, :home))
+        |> redirect(to: Routes.link_path(conn, :stats, link.bit))
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_flash(:error, "Link not created")
@@ -47,6 +48,18 @@ defmodule BitURLWeb.LinkController do
       {:error, %Ecto.Changeset{}} ->
         conn
         |> put_flash(:error, "Server error")
+        |> redirect(to: Routes.link_path(conn, :home))
+    end
+  end
+
+  def stats(conn, %{"bit" => bit}) do
+    case BitURL.get_link_by_bit_with_stats(bit) do
+      {:ok, %Link{} = link, %Stats{} = stats} ->
+        conn
+        |> render("show.html", link: link, stats: stats)
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, reason)
         |> redirect(to: Routes.link_path(conn, :home))
     end
   end

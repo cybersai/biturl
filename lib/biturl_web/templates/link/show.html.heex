@@ -1,0 +1,71 @@
+<section class="phx-hero">
+  <table>
+    <tbody>
+      <tr>
+        <td>Bit</td>
+        <td><%= BitURLWeb.Endpoint.url() %>/<%= @link.bit %></td>
+      </tr>
+      <tr>
+        <td>URL</td>
+        <td><%= @link.url %></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="phx-hero">
+  <table>
+    <thead>
+      <tr>
+        <th>Browser</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for {name, hits} <- @stats.browsers do %>
+      <tr>
+        <td><%= name %></td>
+        <td><%= hits %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
+
+<section class="phx-hero">
+  <table>
+    <thead>
+      <tr>
+        <th>OS</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for {name, hits} <- @stats.oss do %>
+      <tr>
+        <td><%= name %></td>
+        <td><%= hits %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
+
+<section class="phx-hero">
+  <table>
+    <thead>
+      <tr>
+        <th>Device</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for {name, hits} <- @stats.devices do %>
+      <tr>
+        <td><%= name %></td>
+        <td><%= hits %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

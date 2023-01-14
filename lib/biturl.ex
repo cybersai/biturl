@@ -7,6 +7,7 @@ defmodule BitURL do
   if it comes from the database, an external API or others.
   """
   import Ecto.Query, only: [from: 2]
+  alias BitURL.Hit.Stats
   alias BitURL.Link.Summary
   alias BitURL.Repo
   alias BitURL.Link
@@ -44,11 +45,21 @@ defmodule BitURL do
   end
 
   def record_hit_for_link(%Link{} = link, user_agent) do
-    IO.inspect(user_agent)
     link
       |> Ecto.build_assoc(:hits)
       |> Hit.changeset(user_agent |> extract_user_agent_info())
       |> Repo.insert()
+  end
+
+  def get_link_by_bit_with_stats(bit) do
+    case Repo.get_by(Link, bit: bit) do
+      nil -> {:error, "Link not found"}
+      %Link{} = link -> {:ok, link, %Stats{
+        devices: get_stats(link, :device),
+        oss: get_stats(link, :os),
+        browsers: get_stats(link, :browser)
+      }}
+    end
   end
 
   defp extract_user_agent_info(nil) do
@@ -81,5 +92,9 @@ defmodule BitURL do
           true -> "Unknown"
         end
     }
+  end
+
+  defp get_stats(%Link{} = link, column) when is_atom(column) do
+    from(h in Hit, where: h.link_id == ^link.id, group_by: field(h, ^column), select: {field(h, ^column), count(h.id)}) |> Repo.all()
   end
 end
