@@ -1,0 +1,20 @@
+<section class="phx-hero">
+  <table>
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Bit</th>
+        <th>URL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for %BitURL.Link{bit: bit, url: url} <- @links do %>
+      <tr>
+        <td><a href={Routes.link_path(@conn, :stats, bit)}>View</a></td>
+        <td><%= BitURLWeb.Endpoint.url() %>/<%= bit %></td>
+        <td style="word-break:break-all;"><%= url %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

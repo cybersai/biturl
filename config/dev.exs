@@ -10,6 +10,10 @@ config :biturl, BitURL.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: "",
+  client_secret: ""
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

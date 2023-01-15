@@ -4,6 +4,7 @@ defmodule BitURL.Link do
   end
 
   use Ecto.Schema
+  alias BitURL.User
   alias BitURL.Hit
   import Ecto.Changeset
 
@@ -12,6 +13,7 @@ defmodule BitURL.Link do
     field :url, :string
 
     has_many :hits, Hit
+    belongs_to :user, User
 
     timestamps()
   end
@@ -21,6 +23,7 @@ defmodule BitURL.Link do
     link
     |> cast(attrs, [:bit, :url])
     |> validate_required([:bit, :url])
+    |> unique_constraint(:bit)
   end
 
   def bit() do

@@ -7,6 +7,7 @@ defmodule BitURL do
   if it comes from the database, an external API or others.
   """
   import Ecto.Query, only: [from: 2]
+  alias BitURL.User
   alias BitURL.Hit.Stats
   alias BitURL.Link.Summary
   alias BitURL.Repo
@@ -33,8 +34,9 @@ defmodule BitURL do
     end
   end
 
-  def create_link(%{} = link) do
-    %Link{}
+  def create_link(%{} = link, user) do
+    IO.inspect(if user === nil, do: %Link{}, else: Ecto.build_assoc(user, :links))
+    if user === nil, do: %Link{}, else: Ecto.build_assoc(user, :links)
       |> Map.put(:bit, Link.bit())
       |> Link.changeset(link)
       |> Repo.insert()
@@ -60,6 +62,25 @@ defmodule BitURL do
         browsers: get_stats(link, :browser)
       }}
     end
+  end
+
+  def get_or_create_user(%{email: email} = user) do
+    case Repo.get_by(User, email: email) do
+      %User{} = user -> {:ok, user}
+      nil ->
+        %User{}
+        |> User.changeset(user)
+        |> Repo.insert()
+    end
+  end
+
+  def get_user!(id) do
+    Repo.get!(User, id)
+  end
+
+  def get_links_by_user_id(user_id) do
+    from(l in Link, where: l.user_id == ^user_id, order_by: [desc: :id], limit: 20)
+    |> Repo.all()
   end
 
   defp extract_user_agent_info(nil) do

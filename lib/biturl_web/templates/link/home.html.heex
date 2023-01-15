@@ -5,7 +5,7 @@
 
 <section>
   <%= form_for @changeset, Routes.link_path(@conn, :analyze), fn form -> %>
-    <%= url_input form, :url, placeholder: "Enter URL to analyze" %>
+    <%= url_input form, :url, required: "required", placeholder: "Enter URL to analyze" %>
       <div class="row">
         <div class="column column-50 column-offset-25">
           <%= submit "Analyze URL", style: "width: 100%" %>

@@ -8,6 +8,14 @@ defmodule BitURLWeb.Router do
     plug :put_root_layout, {BitURLWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_auth_user
+  end
+
+  def fetch_auth_user(conn, _opts) do
+    case get_session(conn, :auth_id) do
+      nil -> conn
+      id -> assign(conn,  :auth_user, BitURL.get_user!(id))
+    end
   end
 
   pipeline :api do
@@ -17,9 +25,14 @@ defmodule BitURLWeb.Router do
   scope "/", BitURLWeb do
     pipe_through :browser
 
+    get "/auth/:provider", AuthController, :request
+    get "/auth/:provider/callback", AuthController, :callback
+    get "/auth", AuthController, :remove
+
     get "/", LinkController, :home
     post "/analyze", LinkController, :analyze
     post "/links", LinkController, :create
+    get "/links", LinkController, :list
     get "/:bit", LinkController, :hit
     get "/:bit/stats", LinkController, :stats
   end

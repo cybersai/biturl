@@ -21,8 +21,8 @@ defmodule BitURLWeb.LinkController do
     end
   end
 
-  def create(conn, %{"link" => link}) do
-    case BitURL.create_link(link) do
+  def create(%{assigns: assigns} = conn, %{"link" => link}) do
+    case BitURL.create_link(link, assigns[:auth_user]) do
       {:ok, %Link{} = link} ->
         conn
         |> put_flash(:info, "New link created")
@@ -62,5 +62,11 @@ defmodule BitURLWeb.LinkController do
         |> put_flash(:error, reason)
         |> redirect(to: Routes.link_path(conn, :home))
     end
+  end
+
+  def list(%{assigns: %{auth_user: user}} = conn, _params) do
+    links = BitURL.get_links_by_user_id(user.id)
+
+    render(conn, "list.html", links: links)
   end
 end
